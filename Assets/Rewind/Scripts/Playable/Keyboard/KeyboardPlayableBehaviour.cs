@@ -4,7 +4,7 @@ using UnityEngine;
 using UnityEngine.Playables;
 
 // A behaviour that is attached to a playable
-public class KeyboardPlayable : PlayableBehaviour
+public class KeyboardPlayableBehaviour : PlayableBehaviour
 {
     // Called when the owning graph starts playing
     public override void OnGraphStart(Playable playable)

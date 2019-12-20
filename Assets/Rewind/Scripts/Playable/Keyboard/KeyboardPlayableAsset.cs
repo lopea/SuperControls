@@ -4,13 +4,14 @@ using UnityEngine;
 using UnityEngine.Playables;
 
 [System.Serializable]
-public class cool : PlayableAsset
+public class KeyboardPlayableAsset : PlayableAsset
 {
+    public KeyCode key;
+
     // Factory method that generates a playable based on this asset
     public override Playable CreatePlayable(PlayableGraph graph, GameObject go)
     {
-        return Playable.Create(graph);
-       
-    }
 
+        return Playable.Create(graph);
+    }
 }
