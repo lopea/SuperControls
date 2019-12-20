@@ -12,7 +12,7 @@ namespace Lopea.SuperControl.InputHandler
     //delegate for event output
     public delegate void InputEvent(InputArgs input);
 
-    //
+    //a struct to hold all input values
     public struct InputArgs 
     {
         public string inputString;
@@ -24,27 +24,43 @@ namespace Lopea.SuperControl.InputHandler
             this.type = type;
         }
     }
-    public class SuperInputHandler 
+    public class SuperInputHandler : MonoBehaviour 
     {
         //event to send out all inputs
-        static event InputEvent _ev;
+        event InputEvent _ev;
 
         //if the handler is active or not
         static bool _active = false;
 
         //store all input type necessary
-        static InputType _type;
+        InputType _type;
+        
+        //singleton value 
+        static SuperInputHandler _single;
 
         public static void Initialize(InputType type)
         {
             //return if handler is already initialized
-            if (_active)
+            if (_active && (_single._type & type) != type)
+            {
+                _single._type |= type;
                 return;
-           
+            }
+            else if(_active)
+            {
+                return;
+            }
+            //set the singleton value to a value in the scene
+            _single = new GameObject("SuperInputHandler").AddComponent<SuperInputHandler>();
+
             //empty event if necessary
-            if (_ev != null)
-                _ev = null;
-            
+            if (_single._ev != null)
+                _single._ev = null;
+
+
+
+            //set the type to the singleton
+            _single._type = type;
 
             //set handler to active
             _active = true;
@@ -56,7 +72,7 @@ namespace Lopea.SuperControl.InputHandler
         {
             if (!_active)
                 return;
-            _ev += ie;
+            _single._ev += ie;
         }
 
         //remove event to the handler
@@ -64,24 +80,19 @@ namespace Lopea.SuperControl.InputHandler
         {
             if (!_active)
                 return;
-            _ev -= ie;
+            _single._ev -= ie;
 
         }
 
-        //this might not work but whatevs
-        public static void GetUnityHandlers()
+        //shutdown the handler
+        public static void Shutdown()
         {
-            //return if not active
-            if (!_active)
-                return;
+            if()
+            //destroy singleton in the scene
+            Destroy(_single.gameObject);
+            _single = null;
 
-            //keyboard handling
-            if (Input.inputString != "" && (_type & InputType.Keyboard) == InputType.Keyboard)
-                _ev?.Invoke(new InputArgs(Input.inputString, InputType.Keyboard));
-            
-            //mouse handling
-            //TODO:add mouse handling
-            if)
+            _active = false;
         }
        
     }
@@ -93,5 +104,6 @@ namespace Lopea.SuperControl.InputHandler
         Keyboard = 1,
         Mouse = 2,
         Midi = 4,
+        All = 7
     }
 }
