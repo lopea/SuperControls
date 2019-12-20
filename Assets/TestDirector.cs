@@ -10,9 +10,11 @@ public class TestDirector : MonoBehaviour
     TimelineAsset t;
     void Start()
     {
+        //how to add a track to the timeline
         d = GetComponent<PlayableDirector>();
         t = d.playableAsset as TimelineAsset;
         t.CreateTrack<KeyboardTrack>("SUPERHOT");
+        
     }
     
 }
