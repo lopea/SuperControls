@@ -13,19 +13,13 @@ namespace Lopea.SuperControl
 {
     [RequireComponent(typeof(PlayableDirector))]
     public class SuperRecorder : MonoBehaviour
-    {
-        //stores and manipulates the timeline playable asset.
-        PlayableDirector _director;
-
-        //stores the Timeline asset 
-        TimelineAsset _asset;
+    { 
 
         //stores if recorder should start recording
         bool _recording;
 
         //starts recording on awake
-        [SerializeField]
-        bool recordOnAwake;
+        public bool recordOnAwake;
 
         //type of input that gets recorded
         [SerializeField]
@@ -42,6 +36,7 @@ namespace Lopea.SuperControl
             SuperInputHandler.Initialize(Type);
             SuperInputHandler.AddEvent(OnInvoke);
         }
+
 
         public void OnInvoke(InputArgs a)
         {
