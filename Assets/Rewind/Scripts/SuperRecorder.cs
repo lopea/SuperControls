@@ -7,6 +7,7 @@
 using UnityEngine;
 using UnityEngine.Playables;
 using UnityEngine.Timeline;
+using Lopea.SuperControl.InputHandler;
 
 namespace Lopea.SuperControl
 {
@@ -26,9 +27,33 @@ namespace Lopea.SuperControl
         [SerializeField]
         bool recordOnAwake;
 
+        //type of input that gets recorded
+        [SerializeField]
+        InputType Type;
+
         void Update()
         {
-            Debug.Log();
+           
+        }
+
+        public void StartRecording()
+        {
+            _recording = true;
+            SuperInputHandler.Initialize(Type);
+            SuperInputHandler.AddEvent(OnInvoke);
+        }
+
+        public void OnInvoke(InputArgs a)
+        {
+
+            //Keyboard/Joystick handling
+            if((a.type & InputType.KeyJoy) == InputType.KeyJoy)
+            {
+                foreach(KeyCode key in a.keyPresses)
+                {
+                    
+                }
+            }
         }
 
     }
