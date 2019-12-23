@@ -8,6 +8,6 @@ using UnityEngine.Playables;
 [TrackClipType(typeof(KeyboardPlayableAsset))]
 public class KeyboardTrack : TrackAsset
 {
-
+    public string key;
 }
     

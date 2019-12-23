@@ -8,6 +8,7 @@ using UnityEngine;
 using UnityEngine.Playables;
 using UnityEngine.Timeline;
 using Lopea.SuperControl.InputHandler;
+using System;
 
 namespace Lopea.SuperControl
 {
@@ -18,17 +19,34 @@ namespace Lopea.SuperControl
         //stores if recorder should start recording
         bool _recording;
 
-        //starts recording on awake
-        public bool recordOnAwake;
+        //is the recorder recording?
+        public bool Recording { get => _recording; }
+
+        SuperController _controller;
+
+        SuperController Controller
+        {
+            get
+            {
+                
+                if (_controller == null)
+                    _controller = GetComponent<SuperController>();
+
+                return _controller;
+            }
+        }
 
         //type of input that gets recorded
         [SerializeField]
         InputType Type;
 
+        
+        //updated every frame
         void Update()
         {
            
         }
+
 
         public void StartRecording()
         {
@@ -37,6 +55,25 @@ namespace Lopea.SuperControl
             SuperInputHandler.AddEvent(OnInvoke);
         }
 
+        KeyboardTrack GetKeyboardTrack(KeyCode key)
+        {
+            foreach (var tracks in Controller.Timeline.GetRootTracks())
+            {
+                var keyTrack = tracks as KeyboardTrack;
+                if (keyTrack.key.ToLower().Replace(" ", "") == Enum.GetName(typeof(KeyCode), key).ToLower())
+                    return keyTrack;
+               
+            }
+            return null;
+        }
+
+        KeyboardTrack CreateKeyboardTrack(KeyCode key)
+        {
+            var name = Enum.GetName(typeof(KeyCode), key);
+            var ret = Controller.Timeline.CreateTrack<KeyboardTrack>(name);
+            ret.key = name;
+            return ret;
+        }
 
         public void OnInvoke(InputArgs a)
         {
@@ -46,7 +83,12 @@ namespace Lopea.SuperControl
             {
                 foreach(KeyCode key in a.keyPresses)
                 {
+                    var track = GetKeyboardTrack(key);
+                    if (track == null)
+                        track = CreateKeyboardTrack(key);
                     
+
+
                 }
             }
         }

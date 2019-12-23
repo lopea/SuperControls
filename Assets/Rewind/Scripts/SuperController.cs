@@ -8,7 +8,7 @@ using Lopea.SuperControl.InputHandler;
 namespace Lopea.SuperControl
 {
     [RequireComponent(typeof(SuperRecorder))]
-    public class SuperContoller : MonoBehaviour
+    public class SuperController : MonoBehaviour
     {
         //store playabledirector 
         PlayableDirector _director;
@@ -43,18 +43,7 @@ namespace Lopea.SuperControl
             set { _timeline = value; }
         }
 
-        SuperRecorder _recorder;
-
-        public SuperRecorder Recorder
-        {
-            get
-            {
-                if (_recorder == null)
-                    _recorder = GetComponent<SuperRecorder>();
-
-                return _recorder;
-            }
-        }
+        
 
         [SerializeField]
         InputType type;
@@ -62,5 +51,6 @@ namespace Lopea.SuperControl
 
         [SerializeField]
         bool recordOnAwake;
+
     }
 }
