@@ -36,7 +36,7 @@ namespace Lopea.SuperControl
             get
             {
                 if (_timeline == null)
-                    _timeline = _director?.playableAsset as TimelineAsset;
+                    _timeline = Director.playableAsset as TimelineAsset;
 
                 return _timeline;
             }

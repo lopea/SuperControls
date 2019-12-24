@@ -74,7 +74,7 @@ namespace Lopea.SuperControl.InputHandler
           
 
             //set the type to the singleton
-            _single._type = type;
+            _single._type |= type;
 
             //set handler to active
             _active = true;
@@ -87,6 +87,7 @@ namespace Lopea.SuperControl.InputHandler
             if (!_active)
                 return;
             _single._ev += ie;
+            print("hey");
         }
 
         //remove event to the handler
@@ -103,7 +104,7 @@ namespace Lopea.SuperControl.InputHandler
         public static void Shutdown(InputType tRemove)
         {
             //SuperInputHandler has not been initialized or the type given is not in the current type.
-            if (!_active || (_single._type & tRemove) == InputType.None)
+            if (!_active || _single == null || (_single._type & tRemove) == InputType.None)
                 return;
 
             //remove value from the type
@@ -115,9 +116,8 @@ namespace Lopea.SuperControl.InputHandler
             {
                 //destroy singleton in the scene
                 Destroy(_single.gameObject);
-
+                print("Destroying SuperEventHandler");
                 //set empty values
-                _single = null;
                 _active = false;
             }
         }
@@ -125,7 +125,7 @@ namespace Lopea.SuperControl.InputHandler
         //update every frame
         void Update()
         {
-
+           
             if (_active)
             {
                 //keyboard handling
@@ -139,7 +139,8 @@ namespace Lopea.SuperControl.InputHandler
                         if (Input.GetKey(key))
                             //store key in keycodes
                             keycodes.Add(key);
-
+                    
+                    print(keycodes.Count);
                     //send out pressed keys if any
                     if (keycodes.Count != 0)
                         _ev?.Invoke(InputArgs.KeyBoard(keycodes.ToArray()));

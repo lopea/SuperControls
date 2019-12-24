@@ -15,7 +15,7 @@ namespace Lopea.SuperControl
     [RequireComponent(typeof(PlayableDirector))]
     public class SuperRecorder : MonoBehaviour
     { 
-
+        
         //stores if recorder should start recording
         bool _recording;
 
@@ -40,23 +40,45 @@ namespace Lopea.SuperControl
         [SerializeField]
         InputType Type;
 
-        
+        void Awake()
+        {
+            StartRecording();
+        }
         //updated every frame
         void Update()
         {
-           
+           if(Input.GetKeyDown(KeyCode.Escape))
+            StopRecording();
         }
-
+        void OnDisable()
+        {
+            
+            StopRecording();
+        }
 
         public void StartRecording()
         {
+            if(_recording)
+                return;
             _recording = true;
             SuperInputHandler.Initialize(Type);
             SuperInputHandler.AddEvent(OnInvoke);
+            print("Recording has started.");
         }
 
+        //stops all recording and shuts down the input handler
+        public void StopRecording()
+        {
+            if(!_recording)
+                return;
+            _recording = false;
+            SuperInputHandler.RemoveEvent(OnInvoke);
+            SuperInputHandler.Shutdown(Type);
+        }
         KeyboardTrack GetKeyboardTrack(KeyCode key)
         {
+            if(Controller.Timeline == null)
+                print("why");
             foreach (var tracks in Controller.Timeline.GetRootTracks())
             {
                 var keyTrack = tracks as KeyboardTrack;
@@ -75,6 +97,7 @@ namespace Lopea.SuperControl
             return ret;
         }
 
+        //handles event invoke that is given fromt SuperInputHandler
         public void OnInvoke(InputArgs a)
         {
 
@@ -86,8 +109,7 @@ namespace Lopea.SuperControl
                     var track = GetKeyboardTrack(key);
                     if (track == null)
                         track = CreateKeyboardTrack(key);
-                    
-
+                    print("Key Pressed. Key: " + key);
 
                 }
             }
