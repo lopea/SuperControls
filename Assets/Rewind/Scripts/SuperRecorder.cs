@@ -8,6 +8,7 @@ using UnityEngine;
 using UnityEngine.Playables;
 using UnityEngine.Timeline;
 using Lopea.SuperControl.InputHandler;
+using System.Collections.Generic;
 using System;
 
 namespace Lopea.SuperControl
@@ -21,6 +22,8 @@ namespace Lopea.SuperControl
 
         //is the recorder recording?
         public bool Recording { get => _recording; }
+
+        
 
         SuperController _controller;
 
@@ -43,6 +46,8 @@ namespace Lopea.SuperControl
         void Awake()
         {
             StartRecording();
+            Controller.PlayTimeline();
+            
         }
         //updated every frame
         void Update()
@@ -63,9 +68,10 @@ namespace Lopea.SuperControl
             _recording = true;
             SuperInputHandler.Initialize(Type);
             SuperInputHandler.AddEvent(OnInvoke);
+            
             print("Recording has started.");
         }
-
+       
         //stops all recording and shuts down the input handler
         public void StopRecording()
         {
@@ -75,29 +81,8 @@ namespace Lopea.SuperControl
             SuperInputHandler.RemoveEvent(OnInvoke);
             SuperInputHandler.Shutdown(Type);
         }
-        KeyboardTrack GetKeyboardTrack(KeyCode key)
-        {
-            if(Controller.Timeline == null)
-                print("why");
-            foreach (var tracks in Controller.Timeline.GetRootTracks())
-            {
-                var keyTrack = tracks as KeyboardTrack;
-                if (keyTrack.key.ToLower().Replace(" ", "") == Enum.GetName(typeof(KeyCode), key).ToLower())
-                    return keyTrack;
-               
-            }
-            return null;
-        }
 
-        KeyboardTrack CreateKeyboardTrack(KeyCode key)
-        {
-            var name = Enum.GetName(typeof(KeyCode), key);
-            var ret = Controller.Timeline.CreateTrack<KeyboardTrack>(name);
-            ret.key = name;
-            return ret;
-        }
-
-        //handles event invoke that is given fromt SuperInputHandler
+        //handles event invoke that is given from SuperInputHandler
         public void OnInvoke(InputArgs a)
         {
 
@@ -106,10 +91,11 @@ namespace Lopea.SuperControl
             {
                 foreach(KeyCode key in a.keyPresses)
                 {
-                    var track = GetKeyboardTrack(key);
+                    var track = Controller.GetKeyboardTrack(key);
                     if (track == null)
-                        track = CreateKeyboardTrack(key);
-                    print("Key Pressed. Key: " + key);
+                        track = Controller.CreateKeyboardTrack(key);
+                    
+                    
 
                 }
             }

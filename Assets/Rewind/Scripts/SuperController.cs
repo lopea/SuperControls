@@ -4,6 +4,7 @@ using UnityEngine;
 using UnityEngine.Timeline;
 using UnityEngine.Playables;
 using Lopea.SuperControl.InputHandler;
+using System;
 
 namespace Lopea.SuperControl
 {
@@ -51,6 +52,36 @@ namespace Lopea.SuperControl
 
         [SerializeField]
         bool recordOnAwake;
+
+        public void PlayTimeline()
+        {
+            //Add a temp track with a clip
+            var temp = CreateKeyboardTrack(KeyCode.None);
+            var clip = temp.CreateClip<KeyboardPlayableAsset>();
+            clip.duration = 1000;
+            Director.Play();
+        }
+
+        public KeyboardTrack CreateKeyboardTrack(KeyCode key)
+        {
+            var name = Enum.GetName(typeof(KeyCode), key);
+            var ret = Timeline.CreateTrack<KeyboardTrack>(name);
+            ret.key = name;
+            return ret;
+        }
+
+        public KeyboardTrack GetKeyboardTrack(KeyCode key)
+        {
+            
+            foreach (var tracks in Timeline.GetRootTracks())
+            {
+                var keyTrack = tracks as KeyboardTrack;
+                if (keyTrack.key.ToLower().Replace(" ", "") == Enum.GetName(typeof(KeyCode), key).ToLower())
+                    return keyTrack;
+                
+            }
+            return null;
+        }
 
     }
 }
