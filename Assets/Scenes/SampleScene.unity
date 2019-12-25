@@ -245,7 +245,6 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   type: 1
-  recordOnAwake: 0
 --- !u!320 &767705573
 PlayableDirector:
   m_ObjectHideFlags: 0
@@ -257,13 +256,27 @@ PlayableDirector:
   serializedVersion: 3
   m_PlayableAsset: {fileID: 11400000, guid: 0e0812cae73e3f442b78732984a53469, type: 2}
   m_InitialState: 1
-  m_WrapMode: 2
+  m_WrapMode: 0
   m_DirectorUpdateMode: 1
   m_InitialTime: 0
   m_SceneBindings:
   - key: {fileID: 5573731733850768495, guid: 0e0812cae73e3f442b78732984a53469, type: 2}
     value: {fileID: 0}
   - key: {fileID: -4315356663018636789, guid: 0e0812cae73e3f442b78732984a53469, type: 2}
+    value: {fileID: 0}
+  - key: {fileID: -6165859510198345388, guid: 0e0812cae73e3f442b78732984a53469, type: 2}
+    value: {fileID: 0}
+  - key: {fileID: 7150584926064202011, guid: 0e0812cae73e3f442b78732984a53469, type: 2}
+    value: {fileID: 0}
+  - key: {fileID: 8684596341890107556, guid: 0e0812cae73e3f442b78732984a53469, type: 2}
+    value: {fileID: 0}
+  - key: {fileID: -7160917217138806459, guid: 0e0812cae73e3f442b78732984a53469, type: 2}
+    value: {fileID: 0}
+  - key: {fileID: -7978358619584704849, guid: 0e0812cae73e3f442b78732984a53469, type: 2}
+    value: {fileID: 0}
+  - key: {fileID: -6626524140959917984, guid: 0e0812cae73e3f442b78732984a53469, type: 2}
+    value: {fileID: 0}
+  - key: {fileID: -5009468622197617512, guid: 0e0812cae73e3f442b78732984a53469, type: 2}
     value: {fileID: 0}
   m_ExposedReferences:
     m_References: []

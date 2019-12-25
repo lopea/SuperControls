@@ -5,6 +5,7 @@ using UnityEngine.Timeline;
 using UnityEngine.Playables;
 using Lopea.SuperControl.InputHandler;
 using System;
+using System.Linq;
 
 namespace Lopea.SuperControl
 {
@@ -44,24 +45,67 @@ namespace Lopea.SuperControl
             set { _timeline = value; }
         }
 
+        //checks if timeline has any clips in the timeline.
+        public bool isTimelineEmpty
+        {
+            get
+            {
+                //get tracks in the timeline
+                var tracks = Timeline.GetRootTracks();
+                
+                //there are no tracks in the timeline
+                if(tracks.Count() == 0)
+                    return true;
+                
+                //find at least one clip in every tracks
+                foreach(var track in tracks)
+                {
+                    // a clip was found
+                    if(track.GetClips().Count() != 0)
+                        return false;
+                }
+
+                //no clip was found in the timeline
+                return true;
+            }
+        }
         
 
         [SerializeField]
         InputType type;
 
 
-        [SerializeField]
-        bool recordOnAwake;
-
+        
         public void PlayTimeline()
         {
+
+            //The Timeline will NOT play if the timeline is empty
+            //we have to add a placeholder track with clip for it to move
+            if(isTimelineEmpty)
+            {
+
             //Add a temp track with a clip
             var temp = CreateKeyboardTrack(KeyCode.None);
             var clip = temp.CreateClip<KeyboardPlayableAsset>();
+            
+            //give the track and clip a name
+            temp.name = "PlaceHolder";
+            clip.displayName = "Placeholder Clip";
+            
+            //give the clip a LONG duration
             clip.duration = 1000;
-            Director.Play();
+            }
+
+            //start the timeline
+            //note: shouldnt this be the same as Director.Play()?
+            //Director.Play() has some unexpected results 
+            Director.Play(Director.playableAsset); 
         }
 
+        public void StopTimeline()
+        {
+            
+        }
         public KeyboardTrack CreateKeyboardTrack(KeyCode key)
         {
             var name = Enum.GetName(typeof(KeyCode), key);
@@ -81,6 +125,14 @@ namespace Lopea.SuperControl
                 
             }
             return null;
+        }
+
+        public TimelineClip AddKeyboardClip(KeyboardTrack track)
+        {
+            var clip = track.CreateClip<KeyboardPlayableAsset>();
+            clip.start = Director.time;
+            clip.duration = 1;
+            return clip;
         }
 
     }

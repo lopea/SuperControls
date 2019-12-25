@@ -23,6 +23,8 @@ namespace Lopea.SuperControl
         //is the recorder recording?
         public bool Recording { get => _recording; }
 
+        [SerializeField]
+        bool recordOnAwake;
         
 
         SuperController _controller;
@@ -45,9 +47,8 @@ namespace Lopea.SuperControl
 
         void Awake()
         {
-            StartRecording();
-            Controller.PlayTimeline();
-            
+            if(recordOnAwake)
+                StartRecording();
         }
         //updated every frame
         void Update()
@@ -57,27 +58,39 @@ namespace Lopea.SuperControl
         }
         void OnDisable()
         {
-            
-            StopRecording();
+            //stop recording if the recorder is not active in the scene
+            if(_recording)
+                StopRecording();
         }
 
         public void StartRecording()
         {
+            //dont run if the recorder is already recording
             if(_recording)
                 return;
+            
+            //set recorder flag 
             _recording = true;
+            
+            //set SuperEventHandler to get input
             SuperInputHandler.Initialize(Type);
             SuperInputHandler.AddEvent(OnInvoke);
             
-            print("Recording has started.");
+            //Play the timeline
+            Controller.PlayTimeline();
         }
        
         //stops all recording and shuts down the input handler
         public void StopRecording()
         {
+            //dont run if the recorder is not currently recording
             if(!_recording)
                 return;
+
+            //unset recorder flag
             _recording = false;
+            
+            //shutdown SuperInputHandler
             SuperInputHandler.RemoveEvent(OnInvoke);
             SuperInputHandler.Shutdown(Type);
         }
@@ -89,12 +102,17 @@ namespace Lopea.SuperControl
             //Keyboard/Joystick handling
             if((a.type & InputType.KeyJoy) == InputType.KeyJoy)
             {
+                //get all values that are pressed in the keyboard
                 foreach(KeyCode key in a.keyPresses)
                 {
+                    //get track representing the keyboard
                     var track = Controller.GetKeyboardTrack(key);
+
+                    //Make a new track if necessary
                     if (track == null)
                         track = Controller.CreateKeyboardTrack(key);
                     
+                    Controller.AddKeyboardClip(track);
                     
 
                 }
