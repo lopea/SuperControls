@@ -2,18 +2,16 @@
 //https://github.com/lopea
 //Description:
 //Records all input from given devices and adds them to the timeline.
-//NOTE: Component must be the in the same GameObject as the PlayableDirector.
+//NOTE: Component must be the in the same GameObject as the SuperController
 
 using UnityEngine;
-using UnityEngine.Playables;
-using UnityEngine.Timeline;
 using Lopea.SuperControl.InputHandler;
 using System.Collections.Generic;
 using System;
 
 namespace Lopea.SuperControl
 {
-    [RequireComponent(typeof(PlayableDirector))]
+    [RequireComponent(typeof(SuperController))]
     public class SuperRecorder : MonoBehaviour
     { 
         
@@ -33,7 +31,6 @@ namespace Lopea.SuperControl
         {
             get
             {
-                
                 if (_controller == null)
                     _controller = GetComponent<SuperController>();
 
@@ -44,7 +41,6 @@ namespace Lopea.SuperControl
         //type of input that gets recorded
         [SerializeField]
         InputType Type;
-
         void Awake()
         {
             if(recordOnAwake)
@@ -81,7 +77,7 @@ namespace Lopea.SuperControl
         }
        
         //stops all recording and shuts down the input handler
-        public void StopRecording()
+        public void StopRecording(bool StopTimeline = false)
         {
             //dont run if the recorder is not currently recording
             if(!_recording)
@@ -93,6 +89,12 @@ namespace Lopea.SuperControl
             //shutdown SuperInputHandler
             SuperInputHandler.RemoveEvent(OnInvoke);
             SuperInputHandler.Shutdown(Type);
+
+            //stop the timeline if necessary
+            if(StopTimeline)
+                Controller.StopTimeline();
+            else
+                Controller.RemovePlaceholder();
         }
 
         //handles event invoke that is given from SuperInputHandler

@@ -1,11 +1,17 @@
-﻿using System.Collections;
-using System.Collections.Generic;
+﻿//SuperController.cs by Javier Sandoval(lopea)
+//https://github.com/lopea
+//Description:
+//Adds or removes tracks/clips in the timeline.
+//Also handles input and sends it to SuperInput
+//NOTE: Component must be the in the same GameObject as the PlayableDirector.
+
 using UnityEngine;
 using UnityEngine.Timeline;
 using UnityEngine.Playables;
 using Lopea.SuperControl.InputHandler;
 using System;
 using System.Linq;
+using UnityEditor.Timeline;
 
 namespace Lopea.SuperControl
 {
@@ -25,6 +31,7 @@ namespace Lopea.SuperControl
                     _director = GetComponent<PlayableDirector>();
                 
                 return _director;
+                
             }
             set { _director = value; }
         }
@@ -74,66 +81,113 @@ namespace Lopea.SuperControl
         [SerializeField]
         InputType type;
 
+        TrackAsset _placeholder;
+        public void AddPlaceholder()
+        {
+                //Add a temp track with a clip
+                _placeholder = CreateKeyboardTrack(KeyCode.None);
+                var clip = _placeholder.CreateClip<KeyboardPlayableAsset>();
 
+                //give the track and clip a name
+                _placeholder.name = "PlaceHolder";
+                clip.displayName = "Placeholder Clip";
+
+                //give the clip a LONG duration
+                clip.duration = 1000;
+
+                //Update GUI
+                TimelineEditor.Refresh(RefreshReason.ContentsAddedOrRemoved);
+        }
         
+        public void RemovePlaceholder()
+        {
+             //check if a place holder was made
+            if(_placeholder != null)
+            {
+
+                //remove the placeholder
+                Timeline.DeleteTrack(_placeholder);
+                _placeholder = null;
+
+                //update the GUI
+                TimelineEditor.Refresh(RefreshReason.ContentsAddedOrRemoved);
+            }
+
+        }
         public void PlayTimeline()
         {
 
             //The Timeline will NOT play if the timeline is empty
-            //we have to add a placeholder track with clip for it to move
+            //we have to add a placeholder track with clip for the timeline to play
             if(isTimelineEmpty)
-            {
-
-            //Add a temp track with a clip
-            var temp = CreateKeyboardTrack(KeyCode.None);
-            var clip = temp.CreateClip<KeyboardPlayableAsset>();
+                AddPlaceholder();
             
-            //give the track and clip a name
-            temp.name = "PlaceHolder";
-            clip.displayName = "Placeholder Clip";
-            
-            //give the clip a LONG duration
-            clip.duration = 1000;
-            }
-
             //start the timeline
             //note: shouldnt this be the same as Director.Play()?
             //Director.Play() has some unexpected results 
             Director.Play(Director.playableAsset); 
         }
 
+       
         public void StopTimeline()
         {
+
             
+            //remove the placeholder if necessary 
+            RemovePlaceholder();
+
+            //stop the timeline
+            Director.Stop();
         }
         public KeyboardTrack CreateKeyboardTrack(KeyCode key)
         {
+            //get name for new track
             var name = Enum.GetName(typeof(KeyCode), key);
+
+            //create track
             var ret = Timeline.CreateTrack<KeyboardTrack>(name);
             ret.key = name;
+            
+            //refresh GUI
+            TimelineEditor.Refresh(RefreshReason.ContentsAddedOrRemoved);
+
             return ret;
         }
 
         public KeyboardTrack GetKeyboardTrack(KeyCode key)
         {
-            
-            foreach (var tracks in Timeline.GetRootTracks())
+            //get each track and check it it is for the current keycode
+            var tracks = Timeline.GetRootTracks();
+            for(int i = 0; i < tracks.Count(); i++)
             {
-                var keyTrack = tracks as KeyboardTrack;
+                var keyTrack = tracks.ElementAt(i) as KeyboardTrack;
                 if (keyTrack.key.ToLower().Replace(" ", "") == Enum.GetName(typeof(KeyCode), key).ToLower())
                     return keyTrack;
                 
             }
+            //track not found
             return null;
         }
-
+       
         public TimelineClip AddKeyboardClip(KeyboardTrack track)
         {
+            //create a new clip
             var clip = track.CreateClip<KeyboardPlayableAsset>();
+
+            //set clip values
             clip.start = Director.time;
-            clip.duration = 1;
+            clip.duration  = 1;
+            
+            //refresh GUI
+            TimelineEditor.Refresh(RefreshReason.ContentsAddedOrRemoved);
             return clip;
         }
 
+        void Update()
+        {
+            if(Director.state == PlayState.Playing)
+                SuperInput.UpdateKeys((float)Director.time);
+        }
+        
     }
 }

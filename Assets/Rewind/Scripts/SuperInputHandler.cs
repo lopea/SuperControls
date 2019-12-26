@@ -87,7 +87,7 @@ namespace Lopea.SuperControl.InputHandler
             if (!_active)
                 return;
             _single._ev += ie;
-            print("hey");
+            
         }
 
         //remove event to the handler
@@ -125,7 +125,7 @@ namespace Lopea.SuperControl.InputHandler
         //update every frame
         void Update()
         {
-           
+            //check if handler is active
             if (_active)
             {
                 //keyboard handling
@@ -140,7 +140,6 @@ namespace Lopea.SuperControl.InputHandler
                             //store key in keycodes
                             keycodes.Add(key);
                     
-                    print(keycodes.Count);
                     //send out pressed keys if any
                     if (keycodes.Count != 0)
                         _ev?.Invoke(InputArgs.KeyBoard(keycodes.ToArray()));
