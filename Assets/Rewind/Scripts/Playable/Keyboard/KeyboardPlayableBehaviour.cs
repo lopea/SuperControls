@@ -32,7 +32,7 @@ public class KeyboardPlayableBehaviour : PlayableBehaviour
     // Called when the state of the playable is set to Paused
     public override void OnBehaviourPause(Playable playable, FrameData info)
     {
-        
+        SuperInput.UnsetKey(key);
     }
 
     // Called each frame while the state is set to Play

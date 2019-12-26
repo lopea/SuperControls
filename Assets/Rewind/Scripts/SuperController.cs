@@ -82,15 +82,17 @@ namespace Lopea.SuperControl
         InputType type;
 
         TrackAsset _placeholder;
+
+        float _deltaTime;
         public void AddPlaceholder()
         {
                 //Add a temp track with a clip
-                _placeholder = CreateKeyboardTrack(KeyCode.None);
-                var clip = _placeholder.CreateClip<KeyboardPlayableAsset>();
+                _placeholder = Timeline.CreateTrack<PlaceHolderTrack>();
+                var clip = _placeholder.CreateClip<PlaceHolderAsset>();
 
                 //give the track and clip a name
-                _placeholder.name = "PlaceHolder";
-                clip.displayName = "Placeholder Clip";
+                _placeholder.name = "Recording...";
+                clip.displayName = "Recording Input.";
 
                 //give the clip a LONG duration
                 clip.duration = 1000;
@@ -114,16 +116,16 @@ namespace Lopea.SuperControl
             }
 
         }
-        public void PlayTimeline()
+        public void PlayTimeline(bool recording = false)
         {
 
             //The Timeline will NOT play if the timeline is empty
             //we have to add a placeholder track with clip for the timeline to play
-            if(isTimelineEmpty)
+            if(recording)
                 AddPlaceholder();
             
             //start the timeline
-            //note: shouldnt this be the same as Director.Play()?
+            //note: shouldn't this be the same as Director.Play()?
             //Director.Play() has some unexpected results 
             Director.Play(Director.playableAsset); 
         }
@@ -157,10 +159,14 @@ namespace Lopea.SuperControl
         public KeyboardTrack GetKeyboardTrack(KeyCode key)
         {
             //get each track and check it it is for the current keycode
-            var tracks = Timeline.GetRootTracks();
+            var tracks = Timeline.GetRootTracks().OfType<KeyboardTrack>();
+            if(tracks.Count() == 0)
+                return null;
             for(int i = 0; i < tracks.Count(); i++)
             {
-                var keyTrack = tracks.ElementAt(i) as KeyboardTrack;
+                var keyTrack = tracks.ElementAt(i);
+                if(keyTrack == null)
+                    continue;
                 if (keyTrack.key.ToLower().Replace(" ", "") == Enum.GetName(typeof(KeyCode), key).ToLower())
                     return keyTrack;
                 
@@ -176,18 +182,24 @@ namespace Lopea.SuperControl
 
             //set clip values
             clip.start = Director.time;
-            clip.duration  = 1;
+            clip.duration  = _deltaTime;
             
             //refresh GUI
             TimelineEditor.Refresh(RefreshReason.ContentsAddedOrRemoved);
             return clip;
         }
 
+        public TimelineClip ExtendClip(TimelineClip clip)
+        {
+            clip.duration += _deltaTime;
+            TimelineEditor.Refresh(RefreshReason.ContentsModified);
+            return clip;
+        }
         void Update()
         {
             if(Director.state == PlayState.Playing)
                 SuperInput.UpdateKeys((float)Director.time);
         }
-        
+        public void getDeltaTime(float time) => _deltaTime = Time.deltaTime;
     }
 }

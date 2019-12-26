@@ -7,7 +7,10 @@
 using UnityEngine;
 using Lopea.SuperControl.InputHandler;
 using System.Collections.Generic;
+using UnityEngine.Playables;
+using UnityEngine.Timeline;
 using System;
+using System.Linq;
 
 namespace Lopea.SuperControl
 {
@@ -24,6 +27,8 @@ namespace Lopea.SuperControl
         [SerializeField]
         bool recordOnAwake;
         
+        //store clips that are not fully complete
+        Dictionary<KeyCode, TimelineClip> newClips  = new Dictionary<KeyCode, TimelineClip>();
 
         SuperController _controller;
 
@@ -49,8 +54,15 @@ namespace Lopea.SuperControl
         //updated every frame
         void Update()
         {
-           if(Input.GetKeyDown(KeyCode.Escape))
-            StopRecording();
+            if(Recording)
+            {
+                for(int i = 0; i < newClips.Count; i++)
+                {
+                    var clip = newClips.ElementAt(i);
+                    if(!Input.GetKey(clip.Key))
+                        newClips.Remove(clip.Key);
+                }
+            }
         }
         void OnDisable()
         {
@@ -73,7 +85,7 @@ namespace Lopea.SuperControl
             SuperInputHandler.AddEvent(OnInvoke);
             
             //Play the timeline
-            Controller.PlayTimeline();
+            Controller.PlayTimeline(true);
         }
        
         //stops all recording and shuts down the input handler
@@ -97,6 +109,7 @@ namespace Lopea.SuperControl
                 Controller.RemovePlaceholder();
         }
 
+        
         //handles event invoke that is given from SuperInputHandler
         public void OnInvoke(InputArgs a)
         {
@@ -104,6 +117,7 @@ namespace Lopea.SuperControl
             //Keyboard/Joystick handling
             if((a.type & InputType.KeyJoy) == InputType.KeyJoy)
             {
+                
                 //get all values that are pressed in the keyboard
                 foreach(KeyCode key in a.keyPresses)
                 {
@@ -114,10 +128,16 @@ namespace Lopea.SuperControl
                     if (track == null)
                         track = Controller.CreateKeyboardTrack(key);
                     
-                    Controller.AddKeyboardClip(track);
+                    if(newClips.ContainsKey(key))
+                        newClips[key] = Controller.ExtendClip(newClips[key]);
+                    else
+                        newClips.Add(key,Controller.AddKeyboardClip(track));
                     
-
+                    
                 }
+               
+                
+               
             }
         }
 

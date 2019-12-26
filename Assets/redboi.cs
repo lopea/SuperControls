@@ -15,9 +15,9 @@ public class redboi : MonoBehaviour
     // Update is called once per frame
     void Update()
     {
-        if(SuperInput.GetKeyDown(KeyCode.R))
-            GetComponent<Renderer>().material.color = Color.red;
+        if(SuperInput.GetKey(KeyCode.R))
+            GetComponent<Renderer>().sharedMaterial.color = Color.red;
         else
-            GetComponent<Renderer>().material.color = Color.white;
+            GetComponent<Renderer>().sharedMaterial.color = Color.white;
     }
 }
