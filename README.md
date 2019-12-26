@@ -39,6 +39,8 @@ SuperInput.GetKey(KeyCode key);
 SuperInput.GetKeyDown(KeyCode key);
 ```
 ---
+## License
+[MIT](../master/LICENSE)
 ## TODO
 - finish keyboard functions
 - Add Mouse position Integration
