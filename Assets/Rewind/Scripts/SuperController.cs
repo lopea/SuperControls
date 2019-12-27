@@ -195,10 +195,9 @@ namespace Lopea.SuperControl
             TimelineEditor.Refresh(RefreshReason.ContentsModified);
             return clip;
         }
-        void Update()
+        void LateUpdate()
         {
-            if(Director.state == PlayState.Playing)
-                SuperInput.UpdateKeys((float)Director.time);
+            SuperInput.UpdateKeys(this);
         }
         public void getDeltaTime(float time) => _deltaTime = Time.deltaTime;
     }
