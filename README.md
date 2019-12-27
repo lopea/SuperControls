@@ -25,7 +25,7 @@ The SuperControl system is like a "DVR" where it records input given from Unity3
  ### Keyboard
  To implement SuperControls into your keyboard input, replace
 ```csharp
-Input.Getkey(KeyCode.A);
+Input.GetKey(KeyCode.A);
 ```
 to
 ```csharp
