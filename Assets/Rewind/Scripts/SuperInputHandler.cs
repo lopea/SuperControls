@@ -5,7 +5,9 @@
 
 using System.Collections;
 using System.Collections.Generic;
+using System.Linq;
 using UnityEngine;
+using System;
 
 namespace Lopea.SuperControl.InputHandler
 {
@@ -46,7 +48,9 @@ namespace Lopea.SuperControl.InputHandler
         
         //singleton value 
         static SuperInputHandler _single;
-
+        
+        static Array keyList = Enum.GetValues(typeof(KeyCode));
+        
         //Starts the handler if necessary and add the type to the handler
         //if the handler is already initialized, the function adds to the type if necessary
         public static void Initialize(InputType type)
@@ -132,17 +136,28 @@ namespace Lopea.SuperControl.InputHandler
                 if ((_type & InputType.KeyJoy) == InputType.KeyJoy)
                 {
                     //store all keys pressed in the current frame
-                    List<KeyCode> keycodes = new List<KeyCode>();
+                    KeyCode[] keycodes = new KeyCode[0];
                     
                     //get all keys pressed in the current frame
-                    foreach (KeyCode key in System.Enum.GetValues(typeof(KeyCode)))
-                        if (Input.GetKey(key))
-                            //store key in keycodes
-                            keycodes.Add(key);
+                    for(int i = 0; i < keyList.Length; i++)
+                    {
+                        KeyCode key = (KeyCode)keyList.GetValue(i);
+                        if(Input.GetKey(key))
+                        {
+                            //add a new element to the array
+                            KeyCode[] newArray = new KeyCode[keycodes.Length + 1];
+                            for (int j = 0; j < keycodes.Length; j++)
+                            {
+                                newArray[j] = keycodes[j];
+                            }
+                            newArray[keycodes.Length] = key;
+                            keycodes = newArray;
+                        }
+                    }
                     
                     //send out pressed keys if any
-                    if (keycodes.Count != 0)
-                        _ev?.Invoke(InputArgs.KeyBoard(keycodes.ToArray()));
+                    if (keycodes.Length != 0)
+                        _ev?.Invoke(InputArgs.KeyBoard(keycodes));
                 }
 
                 //mouse handling

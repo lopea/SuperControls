@@ -24,6 +24,7 @@ public class KeyboardTrack : TrackAsset
     {
         var playable = ScriptPlayable<KeyboardPlayableBehaviour>.Create(graph);
         playable.GetBehaviour().key = ConvertKey();
+        playable.GetBehaviour().clip = clip;
         playable.GetBehaviour().currentTime = (float)gameObject.GetComponent<PlayableDirector>().time;
         return playable;
     }
