@@ -43,10 +43,16 @@ namespace Lopea.SuperControl
 
             //set key to released.
             if(_kstates.ContainsKey(key))
-                _kstates[key] = KeyState.Released;
+                _kstates.Remove(key);
         }
     }
 
+    public static void ChangeKeyState(KeyCode key, KeyState state, object context)
+    {
+        if(context is KeyboardPlayableBehaviour)
+            if(_kstates.ContainsKey(key))
+                _kstates[key] = state;
+    }
     //returns true on the same frame that the key is pressed
     //or
     //returns true on the same frame the clip corresponding to the key given is initialized
@@ -69,7 +75,7 @@ namespace Lopea.SuperControl
             return Input.GetKey(key);
 
         return (_kstates.ContainsKey(key)) ?
-         _kstates[key] == KeyState.Held || Input.GetKey(key) 
+         _kstates[key] == KeyState.Held || _kstates[key] == KeyState.Pressed || Input.GetKey(key) 
          : Input.GetKey(key);
     }
 
@@ -85,28 +91,7 @@ namespace Lopea.SuperControl
     
     
  
-    public static void UpdateKeys(object context)
-    {
-        if(context is SuperController)
-        {
-            if(_kstates == null)
-                return;
-            
-            for(int i = 0; i < _kstates.Count; i++)
-            {
-                switch(_kstates.ElementAt(i).Value)
-                {
-                    case KeyState.Pressed:
-                        _kstates[_kstates.ElementAt(i).Key] = KeyState.Held;
-                        break;
-                    case KeyState.Released:
-                        _kstates.Remove(_kstates.ElementAt(i).Key);
-                        break;
-                }
-            }
-        }
-        
-    }
+
     
 }
 }

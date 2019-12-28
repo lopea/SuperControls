@@ -184,6 +184,7 @@ namespace Lopea.SuperControl
             clip.start = Director.time;
             clip.duration  = _deltaTime;
             
+
             //refresh GUI
             TimelineEditor.Refresh(RefreshReason.ContentsAddedOrRemoved);
             return clip;
@@ -195,10 +196,7 @@ namespace Lopea.SuperControl
             TimelineEditor.Refresh(RefreshReason.ContentsModified);
             return clip;
         }
-        void LateUpdate()
-        {
-            SuperInput.UpdateKeys(this);
-        }
+
         public void getDeltaTime(float time) => _deltaTime = Time.deltaTime;
     }
 }
