@@ -9,13 +9,13 @@ public class redboi : MonoBehaviour
     // Start is called before the first frame update
     void Awake()
     {
-        
+
     }
 
     // Update is called once per frame
     void Update()
     {
-        if(SuperInput.GetKey(KeyCode.R))
+        if (SuperInput.GetKey(KeyCode.R))
             GetComponent<Renderer>().sharedMaterial.color = Color.red;
         else
             GetComponent<Renderer>().sharedMaterial.color = Color.white;

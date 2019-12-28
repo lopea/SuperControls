@@ -12,6 +12,8 @@ using Lopea.SuperControl.InputHandler;
 using System;
 using System.Linq;
 using UnityEditor.Timeline;
+using Lopea.SuperControl.Timeline;
+using Lopea.SuperControl.Timeline.Internal;
 
 namespace Lopea.SuperControl
 {
@@ -20,7 +22,7 @@ namespace Lopea.SuperControl
     {
         //store playabledirector 
         PlayableDirector _director;
-        
+
         //get playabledirector if necessary
         public PlayableDirector Director
         {
@@ -29,9 +31,9 @@ namespace Lopea.SuperControl
                 //get PlayableDirector from gameobject if necessary
                 if (_director == null)
                     _director = GetComponent<PlayableDirector>();
-                
+
                 return _director;
-                
+
             }
             set { _director = value; }
         }
@@ -59,16 +61,16 @@ namespace Lopea.SuperControl
             {
                 //get tracks in the timeline
                 var tracks = Timeline.GetRootTracks();
-                
+
                 //there are no tracks in the timeline
-                if(tracks.Count() == 0)
+                if (tracks.Count() == 0)
                     return true;
-                
+
                 //find at least one clip in every tracks
-                foreach(var track in tracks)
+                foreach (var track in tracks)
                 {
                     // a clip was found
-                    if(track.GetClips().Count() != 0)
+                    if (track.GetClips().Count() != 0)
                         return false;
                 }
 
@@ -76,35 +78,37 @@ namespace Lopea.SuperControl
                 return true;
             }
         }
-        
+
 
         [SerializeField]
         InputType type;
+
+        public InputType Type { get => type; }
 
         TrackAsset _placeholder;
 
         float _deltaTime;
         public void AddPlaceholder()
         {
-                //Add a temp track with a clip
-                _placeholder = Timeline.CreateTrack<PlaceHolderTrack>();
-                var clip = _placeholder.CreateClip<PlaceHolderAsset>();
+            //Add a temp track with a clip
+            _placeholder = Timeline.CreateTrack<PlaceHolderTrack>();
+            var clip = _placeholder.CreateClip<PlaceHolderAsset>();
 
-                //give the track and clip a name
-                _placeholder.name = "Recording...";
-                clip.displayName = "Recording Input.";
+            //give the track and clip a name
+            _placeholder.name = "Recording...";
+            clip.displayName = "Recording Input.";
 
-                //give the clip a LONG duration
-                clip.duration = 1000;
+            //give the clip a LONG duration
+            clip.duration = 1000;
 
-                //Update GUI
-                TimelineEditor.Refresh(RefreshReason.ContentsAddedOrRemoved);
+            //Update GUI
+            TimelineEditor.Refresh(RefreshReason.ContentsAddedOrRemoved);
         }
-        
+
         public void RemovePlaceholder()
         {
-             //check if a place holder was made
-            if(_placeholder != null)
+            //check if a place holder was made
+            if (_placeholder != null)
             {
 
                 //remove the placeholder
@@ -121,69 +125,69 @@ namespace Lopea.SuperControl
 
             //The Timeline will NOT play if the timeline is empty
             //we have to add a placeholder track with clip for the timeline to play
-            if(recording)
+            if (recording)
                 AddPlaceholder();
-            
+
             //start the timeline
             //note: shouldn't this be the same as Director.Play()?
             //Director.Play() has some unexpected results 
-            Director.Play(Director.playableAsset); 
+            Director.Play(Director.playableAsset);
         }
 
-       
+
         public void StopTimeline()
         {
 
-            
+
             //remove the placeholder if necessary 
             RemovePlaceholder();
 
             //stop the timeline
             Director.Stop();
         }
-        public KeyboardTrack CreateKeyboardTrack(KeyCode key)
+        public SuperInputTrack CreateTrack(KeyCode key)
         {
             //get name for new track
             var name = Enum.GetName(typeof(KeyCode), key);
 
             //create track
-            var ret = Timeline.CreateTrack<KeyboardTrack>(name);
+            var ret = Timeline.CreateTrack<SuperInputTrack>(name);
             ret.key = name;
-            
+
             //refresh GUI
             TimelineEditor.Refresh(RefreshReason.ContentsAddedOrRemoved);
 
             return ret;
         }
 
-        public KeyboardTrack GetKeyboardTrack(KeyCode key)
+        public SuperInputTrack GetTrack(KeyCode key)
         {
             //get each track and check it it is for the current keycode
-            var tracks = Timeline.GetRootTracks().OfType<KeyboardTrack>();
-            if(tracks.Count() == 0)
+            var tracks = Timeline.GetRootTracks().OfType<SuperInputTrack>();
+            if (tracks.Count() == 0)
                 return null;
-            for(int i = 0; i < tracks.Count(); i++)
+            for (int i = 0; i < tracks.Count(); i++)
             {
                 var keyTrack = tracks.ElementAt(i);
-                if(keyTrack == null)
+                if (keyTrack == null)
                     continue;
                 if (keyTrack.key.ToLower().Replace(" ", "") == Enum.GetName(typeof(KeyCode), key).ToLower())
                     return keyTrack;
-                
+
             }
             //track not found
             return null;
         }
-       
-        public TimelineClip AddKeyboardClip(KeyboardTrack track)
+
+        public TimelineClip AddClip(SuperInputTrack track)
         {
             //create a new clip
-            var clip = track.CreateClip<KeyboardPlayableAsset>();
+            var clip = track.CreateClip<SuperInputPlayableAsset>();
 
             //set clip values
             clip.start = Director.time;
-            clip.duration  = _deltaTime;
-            
+            clip.duration = _deltaTime;
+
 
             //refresh GUI
             TimelineEditor.Refresh(RefreshReason.ContentsAddedOrRemoved);
@@ -192,11 +196,12 @@ namespace Lopea.SuperControl
 
         public TimelineClip ExtendClip(TimelineClip clip)
         {
-            clip.duration += _deltaTime;
+            //timeline deltatime sets itself to zero, so recording is only done in game time.
+            clip.duration += Time.deltaTime;
             TimelineEditor.Refresh(RefreshReason.ContentsModified);
             return clip;
         }
 
-        public void getDeltaTime(float time) => _deltaTime = Time.deltaTime;
+
     }
 }

@@ -3,10 +3,13 @@ using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.Playables;
 
-public class PlaceHolderAsset : PlayableAsset
+namespace Lopea.SuperControl.Timeline.Internal
 {
-    public override Playable CreatePlayable(PlayableGraph graph, GameObject owner)
+    public class PlaceHolderAsset : PlayableAsset
     {
-        return ScriptPlayable<PlaceHolderBehaviour>.Create(graph);
+        public override Playable CreatePlayable(PlayableGraph graph, GameObject owner)
+        {
+            return ScriptPlayable<PlaceHolderBehaviour>.Create(graph);
+        }
     }
 }

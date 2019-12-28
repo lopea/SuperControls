@@ -3,6 +3,9 @@ using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.Playables;
 using System;
+
+namespace Lopea.SuperControl.Timeline.Internal
+{
 // A behaviour that is attached to a playable
 public class PlaceHolderBehaviour : PlayableBehaviour
 {
@@ -37,4 +40,5 @@ public class PlaceHolderBehaviour : PlayableBehaviour
     {
            sendDelta?.Invoke(info.deltaTime);
     }
+}
 }

@@ -4,6 +4,9 @@ using UnityEngine;
 using UnityEngine.Playables;
 using UnityEngine.Timeline;
 using Lopea.SuperControl;
+
+namespace Lopea.SuperControl.Timeline.Internal
+{
 [TrackClipType(typeof(PlaceHolderAsset))]
 [TrackColor(1,0,0)]
 public class PlaceHolderTrack : TrackAsset
@@ -16,7 +19,7 @@ public class PlaceHolderTrack : TrackAsset
            d = gameObject.AddComponent<SuperController>();
         }   
         var playable = ScriptPlayable<PlaceHolderBehaviour>.Create(graph);
-        playable.GetBehaviour().sendDelta = d.getDeltaTime;
         return playable;
     }
+}
 }

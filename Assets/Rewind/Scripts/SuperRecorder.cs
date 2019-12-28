@@ -44,8 +44,7 @@ namespace Lopea.SuperControl
         }
 
         //type of input that gets recorded
-        [SerializeField]
-        InputType Type;
+        
         void Awake()
         {
             if(recordOnAwake)
@@ -81,7 +80,7 @@ namespace Lopea.SuperControl
             _recording = true;
             
             //set SuperEventHandler to get input
-            SuperInputHandler.Initialize(Type);
+            SuperInputHandler.Initialize(Controller.Type);
             SuperInputHandler.AddEvent(OnInvoke);
             
             //Play the timeline
@@ -100,7 +99,7 @@ namespace Lopea.SuperControl
             
             //shutdown SuperInputHandler
             SuperInputHandler.RemoveEvent(OnInvoke);
-            SuperInputHandler.Shutdown(Type);
+            SuperInputHandler.Shutdown(Controller.Type);
 
             //stop the timeline if necessary
             if(StopTimeline)
@@ -122,16 +121,16 @@ namespace Lopea.SuperControl
                 foreach(KeyCode key in a.keyPresses)
                 {
                     //get track representing the keyboard
-                    var track = Controller.GetKeyboardTrack(key);
+                    var track = Controller.GetTrack(key);
 
                     //Make a new track if necessary
                     if (track == null)
-                        track = Controller.CreateKeyboardTrack(key);
+                        track = Controller.CreateTrack(key);
                     
                     if(newClips.ContainsKey(key))
                         newClips[key] = Controller.ExtendClip(newClips[key]);
                     else
-                        newClips.Add(key,Controller.AddKeyboardClip(track));
+                        newClips.Add(key,Controller.AddClip(track));
                     
                     
                 }

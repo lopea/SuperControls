@@ -15,7 +15,7 @@ namespace Lopea.SuperControl.InputHandler
     public delegate void InputEvent(InputArgs arg);
 
     //a struct to hold all keyboard input values
-    public struct InputArgs 
+    public struct InputArgs
     {
         public KeyCode[] keyPresses;
         public InputType type;
@@ -35,7 +35,7 @@ namespace Lopea.SuperControl.InputHandler
 
     //this Component will track all incoming input and sends it through an event
     //the Component will add itself to the scene when called and shut itself down when no recorder is using it
-    public class SuperInputHandler : MonoBehaviour 
+    public class SuperInputHandler : MonoBehaviour
     {
         //event to send out all inputs
         event InputEvent _ev;
@@ -45,12 +45,12 @@ namespace Lopea.SuperControl.InputHandler
 
         //store all input type necessary
         InputType _type;
-        
+
         //singleton value 
         static SuperInputHandler _single;
-        
+
         static Array keyList = Enum.GetValues(typeof(KeyCode));
-        
+
         //Starts the handler if necessary and add the type to the handler
         //if the handler is already initialized, the function adds to the type if necessary
         public static void Initialize(InputType type)
@@ -62,7 +62,7 @@ namespace Lopea.SuperControl.InputHandler
                 _single._type |= type;
                 return;
             }
-            else if(_active)
+            else if (_active)
             {
                 //already initialized
                 return;
@@ -75,7 +75,7 @@ namespace Lopea.SuperControl.InputHandler
             if (_single._ev != null)
                 _single._ev = null;
 
-          
+
 
             //set the type to the singleton
             _single._type |= type;
@@ -91,11 +91,11 @@ namespace Lopea.SuperControl.InputHandler
             if (!_active)
                 return;
             _single._ev += ie;
-            
+
         }
 
         //remove event to the handler
-        public static void RemoveEvent(InputEvent ie) 
+        public static void RemoveEvent(InputEvent ie)
         {
             if (!_active)
                 return;
@@ -137,12 +137,12 @@ namespace Lopea.SuperControl.InputHandler
                 {
                     //store all keys pressed in the current frame
                     KeyCode[] keycodes = new KeyCode[0];
-                    
+
                     //get all keys pressed in the current frame
-                    for(int i = 0; i < keyList.Length; i++)
+                    for (int i = 0; i < keyList.Length; i++)
                     {
                         KeyCode key = (KeyCode)keyList.GetValue(i);
-                        if(Input.GetKey(key))
+                        if (Input.GetKey(key))
                         {
                             //add a new element to the array
                             KeyCode[] newArray = new KeyCode[keycodes.Length + 1];
@@ -154,19 +154,19 @@ namespace Lopea.SuperControl.InputHandler
                             keycodes = newArray;
                         }
                     }
-                    
+
                     //send out pressed keys if any
                     if (keycodes.Length != 0)
                         _ev?.Invoke(InputArgs.KeyBoard(keycodes));
                 }
 
                 //mouse handling
-                if((_type & InputType.Mouse) == InputType.Mouse)
+                if ((_type & InputType.Mouse) == InputType.Mouse)
                 {
                     //send out current mouse position
                     _ev?.Invoke(InputArgs.Mouse());
                 }
-                
+
             }
         }
 
