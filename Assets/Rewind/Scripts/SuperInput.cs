@@ -17,10 +17,20 @@ namespace Lopea.SuperControl
     {
         static Dictionary<KeyCode, KeyState> _kstates;
 
+        public static Vector2 _mouse;
+        //get mouse position
+        public static Vector2 mousePosition
+        {
+            get
+            {
+                return _mouse;
+            }
+            private set => _mouse = value;
+        }
 
         public static void SetKey(KeyCode key, object context)
         {
-            if (context is SuperInputPlayableBehaviour)
+            if (context is StaticInputPlayableBehaviour)
             {
                 //initialize the list if necessary
                 if (_kstates == null)
@@ -36,7 +46,7 @@ namespace Lopea.SuperControl
 
         public static void UnsetKey(KeyCode key, object context)
         {
-            if (context is SuperInputPlayableBehaviour)
+            if (context is StaticInputPlayableBehaviour)
             {
                 //dont do anything if the list is null
                 if (_kstates == null)
@@ -50,7 +60,7 @@ namespace Lopea.SuperControl
 
         public static void ChangeKeyState(KeyCode key, KeyState state, object context)
         {
-            if (context is SuperInputPlayableBehaviour)
+            if (context is StaticInputPlayableBehaviour)
                 if (_kstates.ContainsKey(key))
                     _kstates[key] = state;
         }
@@ -90,8 +100,17 @@ namespace Lopea.SuperControl
             : Input.GetKeyUp(key);
         }
 
-
-
+        public static void SetMouse(Vector2 relpos, object context)
+        {
+            if(context is DynamicInputPlayableBehaviour)
+                mousePosition = Vector2.Scale(new Vector2(Screen.width,Screen.height), relpos);
+        }
+        public static void UnsetMouse(object context)
+        {
+            if(context is DynamicInputPlayableBehaviour)
+                mousePosition = Vector2.zero;
+        }
+        
 
 
     }

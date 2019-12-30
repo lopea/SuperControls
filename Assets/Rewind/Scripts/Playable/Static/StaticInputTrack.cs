@@ -8,20 +8,22 @@ using System;
 namespace Lopea.SuperControl.Timeline
 {
     //same as InputType but with no flags
-    public enum TrackType
+    public enum StaticTrackType
     {
-        None,
         KeyJoy,
         Midi,
-        Mouse
     }
 
     [TrackColor(0, 0, 0)]
-    [TrackClipType(typeof(SuperInputPlayableAsset))]
-    public class SuperInputTrack : TrackAsset
+    [TrackClipType(typeof(StaticInputPlayableAsset))]
+    public class StaticInputTrack : TrackAsset
     {
         public string key;
-        public TrackType type;
+        public StaticTrackType type;
+
+        public AnimationCurve mouseX;
+
+        public AnimationCurve mouseY;
 
         KeyCode ConvertKey()
         {
@@ -35,10 +37,10 @@ namespace Lopea.SuperControl.Timeline
         }
         protected override Playable CreatePlayable(PlayableGraph graph, GameObject gameObject, TimelineClip clip)
         {
-            var playable = ScriptPlayable<SuperInputPlayableBehaviour>.Create(graph);
+            var playable = ScriptPlayable<StaticInputPlayableBehaviour>.Create(graph);
             switch(type)
             {
-                case TrackType.KeyJoy:
+                case StaticTrackType.KeyJoy:
                     playable.GetBehaviour().key = ConvertKey();
                     playable.GetBehaviour().clip = clip;
                     break;

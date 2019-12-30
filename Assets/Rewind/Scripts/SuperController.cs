@@ -11,13 +11,14 @@ using UnityEngine.Playables;
 using Lopea.SuperControl.InputHandler;
 using System;
 using System.Linq;
+using System.Collections.Generic;
 using UnityEditor.Timeline;
 using Lopea.SuperControl.Timeline;
 using Lopea.SuperControl.Timeline.Internal;
 
 namespace Lopea.SuperControl
 {
-    [RequireComponent(typeof(SuperRecorder))]
+    [RequireComponent(typeof(PlayableDirector))]
     public class SuperController : MonoBehaviour
     {
         //store playabledirector 
@@ -81,13 +82,13 @@ namespace Lopea.SuperControl
 
 
         [SerializeField]
-        InputType type;
+        InputType type = InputType.None;
 
         public InputType Type { get => type; }
 
         TrackAsset _placeholder;
-
-        float _deltaTime;
+        
+        internal TrackAsset mouseTrack;
         public void AddPlaceholder()
         {
             //Add a temp track with a clip
@@ -104,6 +105,30 @@ namespace Lopea.SuperControl
             //Update GUI
             TimelineEditor.Refresh(RefreshReason.ContentsAddedOrRemoved);
         }
+
+        public void SetMouseTrack()
+        {
+            if(mouseTrack == null)
+            {
+                var tracks = Timeline.GetRootTracks().OfType<DynamicInputTrack>();
+                if(tracks.Count() == 0)
+                    mouseTrack = CreateDynamicTrack(DynamicTrackType.Mouse);
+                else
+                {
+                    for(int i = 0; i < tracks.Count(); i++)
+                    {
+                        if(tracks.ElementAt(i).type == DynamicTrackType.Mouse)
+                        {
+                            mouseTrack = tracks.ElementAt(i);
+                            return;
+                        }
+                    }
+                    mouseTrack = CreateDynamicTrack(DynamicTrackType.Mouse);
+                }
+            }
+               
+        }
+
 
         public void RemovePlaceholder()
         {
@@ -137,33 +162,51 @@ namespace Lopea.SuperControl
 
         public void StopTimeline()
         {
-
-
             //remove the placeholder if necessary 
             RemovePlaceholder();
 
             //stop the timeline
             Director.Stop();
         }
-        public SuperInputTrack CreateTrack(KeyCode key)
+        public StaticInputTrack CreateStaticTrack(StaticTrackType type, params object[] args)
         {
-            //get name for new track
-            var name = Enum.GetName(typeof(KeyCode), key);
+            switch (type)
+            {
+                case StaticTrackType.KeyJoy:
+                    //get name for new track
+                    var name = Enum.GetName(typeof(KeyCode), (KeyCode)args[0]);
 
-            //create track
-            var ret = Timeline.CreateTrack<SuperInputTrack>(name);
-            ret.key = name;
+                    //create track
+                    var ret = Timeline.CreateTrack<StaticInputTrack>(name);
+                    ret.key = name;
 
-            //refresh GUI
-            TimelineEditor.Refresh(RefreshReason.ContentsAddedOrRemoved);
+                    //refresh GUI
+                    TimelineEditor.Refresh(RefreshReason.ContentsAddedOrRemoved);
 
-            return ret;
+                    return ret;
+
+            }
+
+            //? good luck getting here.
+            return null;
         }
 
-        public SuperInputTrack GetTrack(KeyCode key)
+        public DynamicInputTrack CreateDynamicTrack(DynamicTrackType type)
+        {
+            switch(type)
+            {
+                case DynamicTrackType.Mouse:
+                    var mouse = Timeline.CreateTrack<DynamicInputTrack>("MousePosition");
+                    TimelineEditor.Refresh(RefreshReason.ContentsAddedOrRemoved);
+                    return mouse;
+            }
+            return null;
+        }
+
+        public StaticInputTrack GetTrack(KeyCode key)
         {
             //get each track and check it it is for the current keycode
-            var tracks = Timeline.GetRootTracks().OfType<SuperInputTrack>();
+            var tracks = Timeline.GetRootTracks().OfType<StaticInputTrack>();
             if (tracks.Count() == 0)
                 return null;
             for (int i = 0; i < tracks.Count(); i++)
@@ -179,14 +222,14 @@ namespace Lopea.SuperControl
             return null;
         }
 
-        public TimelineClip AddClip(SuperInputTrack track)
+        public TimelineClip AddStaticClip(TrackAsset track)
         {
             //create a new clip
-            var clip = track.CreateClip<SuperInputPlayableAsset>();
-
+            var clip = track.CreateClip<StaticInputPlayableAsset>();
+            
             //set clip values
             clip.start = Director.time;
-            clip.duration = _deltaTime;
+            clip.duration = Time.deltaTime;
 
 
             //refresh GUI
@@ -194,10 +237,24 @@ namespace Lopea.SuperControl
             return clip;
         }
 
+        public TimelineClip AddDynamicClip(TrackAsset track)
+        {
+            //create new clip
+            var clip = track.CreateClip<DynamicInputPlayableAsset>();
+
+            //set clip values
+            clip.start = Director.time;
+            clip.duration = 1/Timeline.editorSettings.fps;
+
+            //refresh GUI
+            TimelineEditor.Refresh(RefreshReason.ContentsAddedOrRemoved);
+
+            return clip;
+        }
+
         public TimelineClip ExtendClip(TimelineClip clip)
         {
-            //timeline deltatime sets itself to zero, so recording is only done in game time.
-            clip.duration += Time.deltaTime;
+            clip.duration = Director.time - clip.start;
             TimelineEditor.Refresh(RefreshReason.ContentsModified);
             return clip;
         }

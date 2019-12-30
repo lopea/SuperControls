@@ -163,8 +163,15 @@ namespace Lopea.SuperControl.InputHandler
                 //mouse handling
                 if ((_type & InputType.Mouse) == InputType.Mouse)
                 {
+                    
+                    var args = InputArgs.Mouse();
+
+                    //get ratio of mouse to current resolution
+                    args.mousepos.x /= Screen.width;
+                    args.mousepos.y /= Screen.height;
+                    
                     //send out current mouse position
-                    _ev?.Invoke(InputArgs.Mouse());
+                    _ev?.Invoke(args);
                 }
 
             }
@@ -180,6 +187,6 @@ namespace Lopea.SuperControl.InputHandler
         KeyJoy = 1,
         Mouse = 2,
         Midi = 4,
-        All = 7
+        Everything = 7
     }
 }

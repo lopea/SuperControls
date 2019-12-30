@@ -9,15 +9,19 @@ namespace Lopea.SuperControl.Timeline
 {
 
     // A behaviour that is attached to a playable
-    public class SuperInputPlayableBehaviour : PlayableBehaviour
+    public class StaticInputPlayableBehaviour : PlayableBehaviour
     {
         public KeyCode key;
+
         [HideInInspector]
         public TimelineClip clip;
 
         [HideInInspector]
-        public TrackType type;
+        public StaticTrackType type;
 
+        
+
+       
         // Called when the owning graph starts playing
         public override void OnGraphStart(Playable playable)
         {
@@ -33,6 +37,7 @@ namespace Lopea.SuperControl.Timeline
         // Called when the state of the playable is set to Play
         public override void OnBehaviourPlay(Playable playable, FrameData info)
         {
+            
             SuperInput.SetKey(key, this);
 
         }
@@ -52,18 +57,17 @@ namespace Lopea.SuperControl.Timeline
             switch (type)
             {
                 //keyboard handling
-                case TrackType.KeyJoy:
+                case StaticTrackType.KeyJoy:
                     //change states when necessary
-                    if (Math.Abs(time - clip.start) < 0.019)
+                    if (Math.Abs(time - clip.start) < 0.019)  //around 60 fps time epsilon
                         SuperInput.ChangeKeyState(key, KeyState.Pressed, this);
                     else if (Math.Abs(time - clip.end) < 0.019)
                         SuperInput.ChangeKeyState(key, KeyState.Released, this);
                     else
                         SuperInput.ChangeKeyState(key, KeyState.Held, this);
-                    break;
-                
+                    break;  
             }
-
+            
         }
     }
 }

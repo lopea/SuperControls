@@ -11,13 +11,14 @@ using UnityEngine.Playables;
 using UnityEngine.Timeline;
 using System;
 using System.Linq;
+using Lopea.SuperControl.Timeline;
 
 namespace Lopea.SuperControl
 {
     [RequireComponent(typeof(SuperController))]
     public class SuperRecorder : MonoBehaviour
-    { 
-        
+    {
+
         //stores if recorder should start recording
         bool _recording;
 
@@ -25,10 +26,17 @@ namespace Lopea.SuperControl
         public bool Recording { get => _recording; }
 
         [SerializeField]
-        bool recordOnAwake;
-        
+        bool recordOnAwake = false;
+
         //store clips that are not fully complete
-        Dictionary<KeyCode, TimelineClip> newClips  = new Dictionary<KeyCode, TimelineClip>();
+        Dictionary<object, TimelineClip> newClips = new Dictionary<object, TimelineClip>();
+
+        //track for mouse positions (you can only record one track)
+
+        //store last mouse position
+        Vector2 _lastMouse;
+
+        TimelineClip lastMouseClip;
 
         SuperController _controller;
 
@@ -44,99 +52,137 @@ namespace Lopea.SuperControl
         }
 
         //type of input that gets recorded
-        
+
         void Awake()
         {
-            if(recordOnAwake)
+            if (recordOnAwake)
                 StartRecording();
         }
         //updated every frame
         void Update()
         {
-            if(Recording)
+            if (Recording)
             {
-                for(int i = 0; i < newClips.Count; i++)
+
+                for (int i = 0; i < newClips.Count; i++)
                 {
                     var clip = newClips.ElementAt(i);
-                    if(!Input.GetKey(clip.Key))
-                        newClips.Remove(clip.Key);
+                    if (clip.Key is KeyCode)
+                    {
+                        if (!Input.GetKey((KeyCode)clip.Key))
+                            newClips.Remove(clip.Key);
+                    }
                 }
+
             }
         }
         void OnDisable()
         {
             //stop recording if the recorder is not active in the scene
-            if(_recording)
+            if (_recording)
                 StopRecording();
         }
 
         public void StartRecording()
         {
             //dont run if the recorder is already recording
-            if(_recording)
+            if (_recording)
                 return;
-            
+
             //set recorder flag 
             _recording = true;
-            
+
             //set SuperEventHandler to get input
             SuperInputHandler.Initialize(Controller.Type);
             SuperInputHandler.AddEvent(OnInvoke);
-            
+
             //Play the timeline
             Controller.PlayTimeline(true);
+
+            //add a track for mouse
+            if ((Controller.Type & InputType.Mouse) == InputType.Mouse)
+            {
+                Controller.SetMouseTrack();
+                lastMouseClip = Controller.AddDynamicClip(Controller.mouseTrack);
+                var asset = lastMouseClip.asset as DynamicInputPlayableAsset;
+                asset.data1 = Input.mousePosition.x / Screen.width;
+                asset.data2 = Input.mousePosition.y / Screen.height;
+                lastMouseClip.asset = asset;
+            }
         }
-       
+
         //stops all recording and shuts down the input handler
         public void StopRecording(bool StopTimeline = false)
         {
             //dont run if the recorder is not currently recording
-            if(!_recording)
+            if (!_recording)
                 return;
 
             //unset recorder flag
             _recording = false;
-            
+
             //shutdown SuperInputHandler
             SuperInputHandler.RemoveEvent(OnInvoke);
             SuperInputHandler.Shutdown(Controller.Type);
 
             //stop the timeline if necessary
-            if(StopTimeline)
+            if (StopTimeline)
                 Controller.StopTimeline();
             else
                 Controller.RemovePlaceholder();
         }
 
-        
+
         //handles event invoke that is given from SuperInputHandler
         public void OnInvoke(InputArgs a)
         {
 
             //Keyboard/Joystick handling
-            if((a.type & InputType.KeyJoy) == InputType.KeyJoy)
+            if ((a.type & InputType.KeyJoy) == InputType.KeyJoy)
             {
-                
+
                 //get all values that are pressed in the keyboard
-                foreach(KeyCode key in a.keyPresses)
+                foreach (KeyCode key in a.keyPresses)
                 {
                     //get track representing the keyboard
                     var track = Controller.GetTrack(key);
 
                     //Make a new track if necessary
                     if (track == null)
-                        track = Controller.CreateTrack(key);
-                    
-                    if(newClips.ContainsKey(key))
+                        track = Controller.CreateStaticTrack(StaticTrackType.KeyJoy, key);
+
+                    // add/change clips
+                    if (newClips.ContainsKey(key))
                         newClips[key] = Controller.ExtendClip(newClips[key]);
                     else
-                        newClips.Add(key,Controller.AddClip(track));
-                    
-                    
+                        newClips.Add(key, Controller.AddStaticClip(track));
+
+
                 }
-               
+
+            }
+            //Mouse Handling
+            if ((a.type & InputType.Mouse) == InputType.Mouse)
+            {
+                if (Controller.mouseTrack == null)
+                {
+                    Controller.SetMouseTrack();
+                }
+                 if (lastMouseClip != null)
+                        //extend currrent clip
+                        Controller.ExtendClip(lastMouseClip);
+                if (_lastMouse != a.mousepos)
+                {
+                    //create new clip
+                    lastMouseClip = Controller.AddDynamicClip(Controller.mouseTrack);
+                    var asset = lastMouseClip.asset as DynamicInputPlayableAsset;
+                    asset.data1 = a.mousepos.x;
+                    asset.data2 = a.mousepos.y;
+                    lastMouseClip.asset = asset;
+                    //update last position
+                    _lastMouse = a.mousepos;
+                }
                 
-               
             }
         }
 
