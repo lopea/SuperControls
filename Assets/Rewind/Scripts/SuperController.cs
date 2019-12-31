@@ -106,29 +106,7 @@ namespace Lopea.SuperControl
             TimelineEditor.Refresh(RefreshReason.ContentsAddedOrRemoved);
         }
 
-        public void SetMouseTrack()
-        {
-            if(mouseTrack == null)
-            {
-                var tracks = Timeline.GetRootTracks().OfType<DynamicInputTrack>();
-                if(tracks.Count() == 0)
-                    mouseTrack = CreateDynamicTrack(DynamicTrackType.Mouse);
-                else
-                {
-                    for(int i = 0; i < tracks.Count(); i++)
-                    {
-                        if(tracks.ElementAt(i).type == DynamicTrackType.Mouse)
-                        {
-                            mouseTrack = tracks.ElementAt(i);
-                            return;
-                        }
-                    }
-                    mouseTrack = CreateDynamicTrack(DynamicTrackType.Mouse);
-                }
-            }
-               
-        }
-
+       
 
         public void RemovePlaceholder()
         {
@@ -195,14 +173,20 @@ namespace Lopea.SuperControl
         {
             switch(type)
             {
-                case DynamicTrackType.Mouse:
-                    var mouse = Timeline.CreateTrack<DynamicInputTrack>("MousePosition");
+                case DynamicTrackType.MouseX:
+                    var mouseX = Timeline.CreateTrack<DynamicInputTrack>("MouseX");
                     TimelineEditor.Refresh(RefreshReason.ContentsAddedOrRemoved);
-                    return mouse;
+                    return mouseX;
+                case DynamicTrackType.MouseY:
+                    var mouseY = Timeline.CreateTrack<DynamicInputTrack>("MouseY");
+                    TimelineEditor.Refresh(RefreshReason.ContentsAddedOrRemoved);
+                    return mouseY;
             }
             return null;
         }
 
+
+        //TODO: change this for midi
         public StaticInputTrack GetTrack(KeyCode key)
         {
             //get each track and check it it is for the current keycode
@@ -250,6 +234,19 @@ namespace Lopea.SuperControl
             TimelineEditor.Refresh(RefreshReason.ContentsAddedOrRemoved);
 
             return clip;
+        }
+        
+        public TrackAsset FindDynamicTrack(DynamicTrackType track)
+        {
+            var tracks = Timeline.GetRootTracks().OfType<DynamicInputTrack>();
+        
+            for(int i = 0; i < tracks.Count(); i++)
+            {
+                if(tracks.ElementAt(i).type == track)
+                    return tracks.ElementAt(i);
+            }
+            return null;
+        
         }
 
         public TimelineClip ExtendClip(TimelineClip clip)

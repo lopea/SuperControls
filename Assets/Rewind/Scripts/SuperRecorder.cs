@@ -36,8 +36,6 @@ namespace Lopea.SuperControl
         //store last mouse position
         Vector2 _lastMouse;
 
-        TimelineClip lastMouseClip;
-
         SuperController _controller;
 
         SuperController Controller
@@ -99,16 +97,7 @@ namespace Lopea.SuperControl
             //Play the timeline
             Controller.PlayTimeline(true);
 
-            //add a track for mouse
-            if ((Controller.Type & InputType.Mouse) == InputType.Mouse)
-            {
-                Controller.SetMouseTrack();
-                lastMouseClip = Controller.AddDynamicClip(Controller.mouseTrack);
-                var asset = lastMouseClip.asset as DynamicInputPlayableAsset;
-                asset.data1 = Input.mousePosition.x / Screen.width;
-                asset.data2 = Input.mousePosition.y / Screen.height;
-                lastMouseClip.asset = asset;
-            }
+        
         }
 
         //stops all recording and shuts down the input handler
@@ -164,25 +153,20 @@ namespace Lopea.SuperControl
             //Mouse Handling
             if ((a.type & InputType.Mouse) == InputType.Mouse)
             {
-                if (Controller.mouseTrack == null)
+                //mouseX
+                if(!newClips.ContainsKey(DynamicTrackType.MouseX))
                 {
-                    Controller.SetMouseTrack();
+                    var track = Controller.FindDynamicTrack(DynamicTrackType.MouseX);
+                    if(track == null)
+                        track = Controller.CreateDynamicTrack(DynamicTrackType.MouseX);
+
+                    newClips.Add(DynamicTrackType.MouseX, Controller.AddDynamicClip(track));
                 }
-                 if (lastMouseClip != null)
-                        //extend currrent clip
-                        Controller.ExtendClip(lastMouseClip);
-                if (_lastMouse != a.mousepos)
+                if(_lastMouse.x != a.mousepos.x)
                 {
-                    //create new clip
-                    lastMouseClip = Controller.AddDynamicClip(Controller.mouseTrack);
-                    var asset = lastMouseClip.asset as DynamicInputPlayableAsset;
-                    asset.data1 = a.mousepos.x;
-                    asset.data2 = a.mousepos.y;
-                    lastMouseClip.asset = asset;
-                    //update last position
-                    _lastMouse = a.mousepos;
+                    
                 }
-                
+
             }
         }
 

@@ -8,8 +8,7 @@ namespace Lopea.SuperControl.Timeline
 {
     public class DynamicInputPlayableAsset : PlayableAsset
     {
-        public float data1;
-        public float data2;
+        public int index;
         
         public override Playable CreatePlayable(PlayableGraph graph, GameObject owner)
         {

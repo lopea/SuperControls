@@ -8,7 +8,8 @@ namespace Lopea.SuperControl.Timeline
 {
     public enum DynamicTrackType
     {
-        Mouse,
+        MouseX,
+        MouseY,
         MidiCC
     }
     [TrackColor(0, 0, 1)]
@@ -16,6 +17,8 @@ namespace Lopea.SuperControl.Timeline
     public class DynamicInputTrack : TrackAsset
     {
         public DynamicTrackType type;
+        
+        public AnimationCurve[] Curves;
 
         protected override Playable CreatePlayable(PlayableGraph graph, GameObject gameObject, TimelineClip clip)
         {
@@ -23,8 +26,7 @@ namespace Lopea.SuperControl.Timeline
             var castclip = clip.asset as DynamicInputPlayableAsset;
 
             playable.GetBehaviour().type = type;
-            playable.GetBehaviour().data1 = castclip.data1;
-            playable.GetBehaviour().data2 = castclip.data2;
+            playable.GetBehaviour().CurrentCurve = Curves[castclip.index];
 
             return playable;
         }
