@@ -37,11 +37,11 @@ Dont worry! Any current input will still apply.
 ```csharp
 SuperInput.GetKey(KeyCode key);
 SuperInput.GetKeyDown(KeyCode key);
+SuperInput.GetKeyUp(KeyCode key);
 ```
 ---
 ## License
 [MIT](../master/LICENSE)
 ## TODO
-- finish keyboard functions
 - Add Mouse position Integration
 - add Unity InputSystem Integration
