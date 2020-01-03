@@ -59,9 +59,11 @@ namespace Lopea.SuperControl
         //updated every frame
         void Update()
         {
+            // if the recorder is recording
             if (Recording)
             {
-
+                //check every unfinished clip and stop them from extending
+                //keyboard tracks
                 for (int i = 0; i < newClips.Count; i++)
                 {
                     var clip = newClips.ElementAt(i);
@@ -154,15 +156,23 @@ namespace Lopea.SuperControl
             if ((a.type & InputType.Mouse) == InputType.Mouse)
             {
                 //mouseX
+
+                //get track if exists
+                var track = Controller.FindDynamicTrack(DynamicTrackType.MouseX);
+
+                //create track if it doesn't
+                if (track == null)
+                    track = Controller.CreateDynamicTrack(DynamicTrackType.MouseX);
+
+                //checks if the mousex track already exists
                 if(!newClips.ContainsKey(DynamicTrackType.MouseX))
                 {
-                    var track = Controller.FindDynamicTrack(DynamicTrackType.MouseX);
-                    if(track == null)
-                        track = Controller.CreateDynamicTrack(DynamicTrackType.MouseX);
-
                     newClips.Add(DynamicTrackType.MouseX, Controller.AddDynamicClip(track));
                 }
-                if(_lastMouse.x != a.mousepos.x)
+                    
+
+                //check if the current mouse pos is different than previous changed position
+                if(_lastMouse.x != Input.mousePosition.x)
                 {
                     
                 }

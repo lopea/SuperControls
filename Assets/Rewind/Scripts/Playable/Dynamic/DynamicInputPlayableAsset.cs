@@ -9,7 +9,6 @@ namespace Lopea.SuperControl.Timeline
     public class DynamicInputPlayableAsset : PlayableAsset
     {
         public int index;
-        
         public override Playable CreatePlayable(PlayableGraph graph, GameObject owner)
         {
             //store new playable

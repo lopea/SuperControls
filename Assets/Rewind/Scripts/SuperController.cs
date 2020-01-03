@@ -146,6 +146,8 @@ namespace Lopea.SuperControl
             //stop the timeline
             Director.Stop();
         }
+        
+        //creates a static track in the timeline
         public StaticInputTrack CreateStaticTrack(StaticTrackType type, params object[] args)
         {
             switch (type)
@@ -206,6 +208,7 @@ namespace Lopea.SuperControl
             return null;
         }
 
+        //creates a static clip in the track given
         public TimelineClip AddStaticClip(TrackAsset track)
         {
             //create a new clip
@@ -221,6 +224,8 @@ namespace Lopea.SuperControl
             return clip;
         }
 
+        //creates a Dynamic clip on the track given
+        //returns the new clip created
         public TimelineClip AddDynamicClip(TrackAsset track)
         {
             //create new clip
@@ -236,6 +241,9 @@ namespace Lopea.SuperControl
             return clip;
         }
         
+        //find a dynamic track in the timeline of type given
+        //returns first instance of a dynamic track with type 
+        //retunrs null if no track is found
         public TrackAsset FindDynamicTrack(DynamicTrackType track)
         {
             var tracks = Timeline.GetRootTracks().OfType<DynamicInputTrack>();
@@ -249,11 +257,27 @@ namespace Lopea.SuperControl
         
         }
 
+        //extend clip to the current time on the director
         public TimelineClip ExtendClip(TimelineClip clip)
         {
             clip.duration = Director.time - clip.start;
             TimelineEditor.Refresh(RefreshReason.ContentsModified);
             return clip;
+        }
+
+        //checks if the current track has a clip currently playing
+        //returns the timeline clip currently playing 
+        //or null if nothing is found
+        public TimelineClip GetRunningClip(TrackAsset track)
+        {
+            var clips = track.GetClips();
+            for(int i = 0; i < clips.Count(); i ++)
+            {
+                var current = clips.ElementAt(i);
+                if(current.start <= Director.time && current.end >= Director.time)
+                    return current;
+            }
+            return null;
         }
 
 

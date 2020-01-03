@@ -14,6 +14,8 @@ namespace Lopea.SuperControl.Timeline
 
         public AnimationCurve CurrentCurve;
 
+        public bool recording;
+
 
         // Called when the owning graph starts playing
         public override void OnGraphStart(Playable playable)
@@ -43,6 +45,7 @@ namespace Lopea.SuperControl.Timeline
         public override void PrepareFrame(Playable playable, FrameData info)
         {
            
+            
         }
     }
 }
