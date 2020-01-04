@@ -10,7 +10,7 @@ The SuperControl system is like a "DVR" where it records input given from Unity3
 
 ## Setup
 
- 1. Add create a timeline and add it to a GameObject using a PlayableDirector
+ 1. Add create a timeline and add it to a GameObject
  
  2. In that same GameObject, add a SuperController.
  
@@ -39,9 +39,19 @@ SuperInput.GetKey(KeyCode key);
 SuperInput.GetKeyDown(KeyCode key);
 SuperInput.GetKeyUp(KeyCode key);
 ```
+### Mouse
+To implement mouse position to your scripts, replace 
+```csharp
+Input.mousePosition;
+```
+to
+```csharp
+SuperInput.mousePosition;
+```
+SuperInput.mousePosition will default to Input.mousePosition if there are no clips modifing the mouse.
+
 ---
 ## License
 [MIT](../master/LICENSE)
 ## TODO
-- Add Mouse position Integration
 - add Unity InputSystem Integration
