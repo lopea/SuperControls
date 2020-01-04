@@ -34,7 +34,7 @@ namespace Lopea.SuperControl
         //track for mouse positions (you can only record one track)
 
         //store last mouse position
-        Vector2 _lastMouse;
+        Vector2 _lastMouse = Vector2.zero;
 
         SuperController _controller;
 
@@ -71,8 +71,12 @@ namespace Lopea.SuperControl
                     {
                         if (!Input.GetKey((KeyCode)clip.Key))
                             newClips.Remove(clip.Key);
+                        
                     }
+                    else if(clip.Key is DynamicTrackType)
+                        Controller.ExtendClip(clip.Value);
                 }
+                
 
             }
         }
@@ -143,9 +147,7 @@ namespace Lopea.SuperControl
                         track = Controller.CreateStaticTrack(StaticTrackType.KeyJoy, key);
 
                     // add/change clips
-                    if (newClips.ContainsKey(key))
-                        newClips[key] = Controller.ExtendClip(newClips[key]);
-                    else
+                    if (!newClips.ContainsKey(key))
                         newClips.Add(key, Controller.AddStaticClip(track));
 
 
@@ -155,7 +157,9 @@ namespace Lopea.SuperControl
             //Mouse Handling
             if ((a.type & InputType.Mouse) == InputType.Mouse)
             {
+                //
                 //mouseX
+                //
 
                 //get track if exists
                 var track = Controller.FindDynamicTrack(DynamicTrackType.MouseX);
@@ -166,16 +170,32 @@ namespace Lopea.SuperControl
 
                 //checks if the mousex track already exists
                 if(!newClips.ContainsKey(DynamicTrackType.MouseX))
-                {
                     newClips.Add(DynamicTrackType.MouseX, Controller.AddDynamicClip(track));
-                }
-                    
-
+            
                 //check if the current mouse pos is different than previous changed position
-                if(_lastMouse.x != Input.mousePosition.x)
+                if(_lastMouse.x != a.mousepos.x)
                 {
+                    print(a.mousepos);
+                    //get asset in current clip
+                    var asset = newClips[DynamicTrackType.MouseX].asset as DynamicInputPlayableAsset;
                     
+                    //add key to represent change
+                    if(asset.curve == null)
+                        asset.curve = new DynamicCurve();
+                    
+                   
+                    asset.curve.AddKey((float)(Controller.Director.time - newClips[DynamicTrackType.MouseX].start),
+                                       a.mousepos.x);
+                    
+                    //set asset in the clip 
+                    newClips[DynamicTrackType.MouseX].asset = asset;
+
+                    //set last position to the new one
+                    _lastMouse.x = Input.mousePosition.x;
                 }
+
+
+                
 
             }
         }

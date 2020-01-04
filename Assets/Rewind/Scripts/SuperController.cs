@@ -220,7 +220,7 @@ namespace Lopea.SuperControl
 
 
             //refresh GUI
-            TimelineEditor.Refresh(RefreshReason.ContentsAddedOrRemoved);
+            TimelineEditor.Refresh(RefreshReason.SceneNeedsUpdate);
             return clip;
         }
 
@@ -236,7 +236,7 @@ namespace Lopea.SuperControl
             clip.duration = 1/Timeline.editorSettings.fps;
 
             //refresh GUI
-            TimelineEditor.Refresh(RefreshReason.ContentsAddedOrRemoved);
+            TimelineEditor.Refresh(RefreshReason.SceneNeedsUpdate);
 
             return clip;
         }
@@ -260,8 +260,10 @@ namespace Lopea.SuperControl
         //extend clip to the current time on the director
         public TimelineClip ExtendClip(TimelineClip clip)
         {
+            if(clip.end > Director.time)
+                return null;
             clip.duration = Director.time - clip.start;
-            TimelineEditor.Refresh(RefreshReason.ContentsModified);
+            TimelineEditor.Refresh(RefreshReason.WindowNeedsRedraw);
             return clip;
         }
 

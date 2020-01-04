@@ -424,8 +424,6 @@ PlayableDirector:
     value: {fileID: 0}
   - key: {fileID: 1232986457673914456, guid: 0e0812cae73e3f442b78732984a53469, type: 2}
     value: {fileID: 0}
-  - key: {fileID: 3276884144655926414, guid: 0e0812cae73e3f442b78732984a53469, type: 2}
-    value: {fileID: 0}
   m_ExposedReferences:
     m_References: []
 --- !u!4 &767705574
@@ -454,7 +452,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: c3b98c8613344344ea40b1b21200dc7b, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  recordOnAwake: 0
+  recordOnAwake: 1
 --- !u!1 &963194225
 GameObject:
   m_ObjectHideFlags: 0

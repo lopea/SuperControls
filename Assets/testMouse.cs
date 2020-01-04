@@ -7,7 +7,7 @@ public class testMouse : MonoBehaviour
     [ExecuteInEditMode]
     void Update()
     {
-        print(SuperInput.mousePosition);
+        //print(SuperInput.mousePosition);
         var ray = Camera.main.ScreenPointToRay(SuperInput.mousePosition);
         transform.position = ray.GetPoint(10);
         

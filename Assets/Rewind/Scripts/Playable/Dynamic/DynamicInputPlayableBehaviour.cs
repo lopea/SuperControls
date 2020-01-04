@@ -12,10 +12,7 @@ namespace Lopea.SuperControl.Timeline
 
         public DynamicTrackType type;
 
-        public AnimationCurve CurrentCurve;
-
-        public bool recording;
-
+        public DynamicCurve curve;
 
         // Called when the owning graph starts playing
         public override void OnGraphStart(Playable playable)
@@ -44,7 +41,6 @@ namespace Lopea.SuperControl.Timeline
         // Called each frame while the state is set to Play
         public override void PrepareFrame(Playable playable, FrameData info)
         {
-           
             
         }
     }

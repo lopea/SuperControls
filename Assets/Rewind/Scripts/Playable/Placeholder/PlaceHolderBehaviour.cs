@@ -10,7 +10,7 @@ namespace Lopea.SuperControl.Timeline.Internal
 public class PlaceHolderBehaviour : PlayableBehaviour
 {
     
-    public Action<float> sendDelta;
+    public Action Update;
     // Called when the owning graph starts playing
     public override void OnGraphStart(Playable playable)
     {
@@ -38,7 +38,7 @@ public class PlaceHolderBehaviour : PlayableBehaviour
     // Called each frame while the state is set to Play
     public override void PrepareFrame(Playable playable, FrameData info)
     {
-           sendDelta?.Invoke(info.deltaTime);
+           Update?.Invoke();
     }
 }
 }

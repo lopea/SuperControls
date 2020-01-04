@@ -31,11 +31,20 @@ public class DynamicCurve
 
     public void AddKey(float time, float value)
     {
+        if(keys == null)
+        {
+            keys = new DynamicKey[1];
+            keys[0] = new DynamicKey(time,value);
+        }
+        else
+        {
         var newArray = new DynamicKey[keys.Length + 1];
 
         for(int i = 0; i < keys.Length; i ++)
             newArray[i] = keys[i];
         newArray[keys.Length] = new DynamicKey(time, value);
+        keys = newArray;
+        }
     }
 
     int FindNearest(float time)
