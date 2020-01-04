@@ -35,13 +35,21 @@ namespace Lopea.SuperControl.Timeline
         // Called when the state of the playable is set to Paused
         public override void OnBehaviourPause(Playable playable, FrameData info)
         {
-          
+            SuperInput.UnsetMouse(this);
         }
 
         // Called each frame while the state is set to Play
         public override void PrepareFrame(Playable playable, FrameData info)
         {
-            
+            switch(type)
+            {
+                case DynamicTrackType.MouseX:
+                    SuperInput.SetMouseX(curve.Evaluate((float)playable.GetTime()), this);
+                    break;
+                case DynamicTrackType.MouseY:
+                    SuperInput.SetMouseY(curve.Evaluate((float)playable.GetTime()), this);
+                    break;
+            }
         }
     }
 }

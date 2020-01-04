@@ -175,7 +175,7 @@ namespace Lopea.SuperControl
                 //check if the current mouse pos is different than previous changed position
                 if(_lastMouse.x != a.mousepos.x)
                 {
-                    print(a.mousepos);
+                   
                     //get asset in current clip
                     var asset = newClips[DynamicTrackType.MouseX].asset as DynamicInputPlayableAsset;
                     
@@ -194,7 +194,42 @@ namespace Lopea.SuperControl
                     _lastMouse.x = Input.mousePosition.x;
                 }
 
+                //
+                //mouse y
+                //
 
+                 //get track if exists
+                var tracky = Controller.FindDynamicTrack(DynamicTrackType.MouseY);
+
+                //create track if it doesn't
+                if (tracky == null)
+                    tracky = Controller.CreateDynamicTrack(DynamicTrackType.MouseY);
+
+                //checks if the mousex track already exists
+                if(!newClips.ContainsKey(DynamicTrackType.MouseY))
+                    newClips.Add(DynamicTrackType.MouseY, Controller.AddDynamicClip(tracky));
+            
+                //check if the current mouse pos is different than previous changed position
+                if(_lastMouse.y != a.mousepos.y)
+                {
+                    
+                    //get asset in current clip
+                    var asset = newClips[DynamicTrackType.MouseY].asset as DynamicInputPlayableAsset;
+                    
+                    //add key to represent change
+                    if(asset.curve == null)
+                        asset.curve = new DynamicCurve();
+                    
+                   
+                    asset.curve.AddKey((float)(Controller.Director.time - newClips[DynamicTrackType.MouseY].start),
+                                       a.mousepos.y);
+                    
+                    //set asset in the clip 
+                    newClips[DynamicTrackType.MouseY].asset = asset;
+
+                    //set last position to the new one
+                    _lastMouse.y = Input.mousePosition.y;
+                }
                 
 
             }

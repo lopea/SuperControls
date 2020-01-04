@@ -177,11 +177,13 @@ namespace Lopea.SuperControl
             {
                 case DynamicTrackType.MouseX:
                     var mouseX = Timeline.CreateTrack<DynamicInputTrack>("MouseX");
-                    TimelineEditor.Refresh(RefreshReason.ContentsAddedOrRemoved);
+                    TimelineEditor.Refresh(RefreshReason.SceneNeedsUpdate);
+                    mouseX.type = type;
                     return mouseX;
                 case DynamicTrackType.MouseY:
                     var mouseY = Timeline.CreateTrack<DynamicInputTrack>("MouseY");
-                    TimelineEditor.Refresh(RefreshReason.ContentsAddedOrRemoved);
+                    mouseY.type = type;
+                    TimelineEditor.Refresh(RefreshReason.SceneNeedsUpdate);
                     return mouseY;
             }
             return null;

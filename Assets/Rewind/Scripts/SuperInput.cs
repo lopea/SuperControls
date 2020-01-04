@@ -17,15 +17,18 @@ namespace Lopea.SuperControl
     {
         static Dictionary<KeyCode, KeyState> _kstates;
 
-        public static Vector2 _mouse;
+        static bool set = false;
+        static Vector2 _mouse;
         //get mouse position
         public static Vector2 mousePosition
         {
             get
             {
-                return _mouse;
+                if(set)
+                    return _mouse;
+                return Input.mousePosition;
             }
-            private set => _mouse = value;
+           
         }
 
         public static void SetKey(KeyCode key, object context)
@@ -100,15 +103,28 @@ namespace Lopea.SuperControl
             : Input.GetKeyUp(key);
         }
 
-        public static void SetMouse(Vector2 relpos, object context)
+        public static void SetMouseX(float value, object context)
         {
             if(context is DynamicInputPlayableBehaviour)
-                mousePosition = Vector2.Scale(new Vector2(Screen.width,Screen.height), relpos);
+            {
+                _mouse.x = value * Screen.width;
+                set = true;
+            }
+
         }
+        public static void SetMouseY(float value, object context)
+        {
+            if(context is DynamicInputPlayableBehaviour)
+            {
+                _mouse.y = value * Screen.height;
+                set = true;
+            }
+        }
+        
         public static void UnsetMouse(object context)
         {
             if(context is DynamicInputPlayableBehaviour)
-                mousePosition = Vector2.zero;
+                set = false;
         }
         
 
