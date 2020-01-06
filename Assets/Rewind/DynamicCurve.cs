@@ -12,15 +12,30 @@ using UnityEngine;
 [System.Serializable]
 public class DynamicKey
 {
-    public float time;
+    public float[] times;
     public float value;
     
     public DynamicKey(float time, float value)
     {
-        this.time = time;
+        AddTime(time);
         this.value = value;
     } 
-
+    public void AddTime(float newTime)
+    {
+        if(times == null)
+        {
+            times = new float[1];
+            times[0] = newTime;
+        }
+        else
+        {
+            var newArray = new float[times.Length + 1];
+            for(int i = 0; i < times.Length; i++)
+              newArray[i] = times[i];
+            newArray[times.Length] = newTime;
+            times = newArray;
+        }
+    }
 }
 
 [System.Serializable]
@@ -46,18 +61,29 @@ public class DynamicCurve
         keys = newArray;
         }
     }
+    
 
-    int FindNearest(float time)
+    int[] FindNearest(float time)
     {
-        int index = 0;
+        int[] index = new int[2];
         float distance = float.MaxValue;
-
+        
+        //go through every key
         for(int i = 0; i < keys.Length; i ++)
         {
-            if(keys[i].time < keys.Length && Mathf.Abs(keys[i].time - time) < distance)
+            //store value of current key
+            var currKey = keys[i];
+            
+            //loop through every time in key
+            for(int j = 0; j < currKey.times.Length; j++)
             {
-                index = i; 
-                distance = Mathf.Abs(keys[i].time - time);
+                //check if current distance in time is short enough
+                if(Mathf.Abs(currKey.times[j] - time) < distance)
+                {
+                    index[0] = i;
+                    index[1] = j;
+                    distance = Mathf.Abs(currKey.times[j] - time);
+                }
             }
         }
         return index;
@@ -66,12 +92,12 @@ public class DynamicCurve
     
     public float Evaluate(float time, bool lerp = true)
     {
-        int index = FindNearest(time);
-        if(lerp && index != keys.Length - 1)
-            return Mathf.Lerp(keys[index].value, keys[index + 1].value, 
-                Mathf.InverseLerp(keys[index].time, keys[index + 1].time,time));
+        int[] index = FindNearest(time);
+        if(lerp && index[0] != keys.Length - 1)
+            return Mathf.Lerp(keys[index[0]].value, keys[index[0] + 1].value, 
+                Mathf.InverseLerp(keys[index[0]].times[index[1]], keys[index[0] + 1].times[index[1]],time));
         else
-            return keys[index].value;
+            return keys[index[0]].value;
     }
 
 }
